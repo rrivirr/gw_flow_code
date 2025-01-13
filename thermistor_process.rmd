@@ -1,0 +1,39 @@
+
+```{r}
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(lubridate)
+library(mgcv)
+library(reshape2)
+
+
+folder_path<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_10thJan-13thJan2025'
+
+tr_a_002_20250110 <-
+    list.files(path = folder_path,
+               pattern = "\\.CSV$",
+               full.names = T) %>%
+    map_df(~read_csv(., col_types = cols(.default = "c"),skip=0))
+
+tr_a_002_20250110_t<-as.data.frame(tr_a_002_20250110[,c(1:7)])
+
+tr_a_002_20250110_m<-melt(tr_a_002_20250110_t,id.vars="timestamp")
+
+
+tr_a_002_20250110_m$value<-as.numeric(tr_a_002_20250110_m$value)
+tr_a_002_20250110_m$timestamp<-as.numeric(tr_a_002_20250110_m$timestamp)
+
+pdf("~/test.pdf")
+ggplot(tr_a_002_20250110_m,aes(timestamp,value,color=variable))+
+geom_point()
+dev.off()
+
+
+png("~/test.png")
+ggplot(tr_a_002_20250110_m,aes(timestamp,value,color=variable))+
+geom_point()
+dev.off()
+
+
+```
