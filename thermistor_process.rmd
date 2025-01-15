@@ -8,7 +8,7 @@ library(mgcv)
 library(reshape2)
 
 
-folder_path<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_10thJan-13thJan2025'
+import_folder<-function(folder_path){
 
 tr_a_002_20250110 <-
     list.files(path = folder_path,
@@ -16,24 +16,68 @@ tr_a_002_20250110 <-
                full.names = T) %>%
     map_df(~read_csv(., col_types = cols(.default = "c"),skip=0))
 
-tr_a_002_20250110_t<-as.data.frame(tr_a_002_20250110[,c(1:7)])
+tr_a_002_20250110_t<-as.data.frame(tr_a_002_20250110)
+return(tr_a_002_20250110_t)
+}
 
-tr_a_002_20250110_m<-melt(tr_a_002_20250110_t,id.vars="timestamp")
+
+tr_001_20250110_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001_10-13_Jan2025'
+tr_001_20250113_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001-Jan13-Jan14th'
+tr_002_20250110_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_13thJan-14thJan'
+tr_002_20250113_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_10thJan-13thJan2025'
+
+tr_001_20250110_data<-import_folder(tr_001_20250110_folder)
+tr_001_20250110_data$exp_start<-as.Date("2025-01-10")
+tr_001_20250110_data$ring_id<-"tr_001"
+
+tr_001_20250113_data<-import_folder(tr_001_20250113_folder)
+tr_001_20250113_data$exp_start<-as.Date("2025-01-13")
+tr_001_20250113_data$ring_id<-"tr_001"
 
 
-tr_a_002_20250110_m$value<-as.numeric(tr_a_002_20250110_m$value)
-tr_a_002_20250110_m$timestamp<-as.numeric(tr_a_002_20250110_m$timestamp)
+tr_002_20250110_data<-import_folder(tr_002_20250110_folder)
+tr_002_20250110_data$exp_start<-as.Date("2025-01-10")
+tr_002_20250110_data$ring_id<-"tr_002"
 
-pdf("~/test.pdf")
-ggplot(tr_a_002_20250110_m,aes(timestamp,value,color=variable))+
+tr_002_20250113_data<-import_folder(tr_002_20250113_folder)
+tr_002_20250113_data$exp_start<-as.Date("2025-01-13")
+tr_002_20250113_data$ring_id<-"tr_002"
+
+
+tr_test_comb<-bind_rows(tr_001_20250110_data,tr_001_20250113_data,tr_002_20250110_data,tr_002_20250113_data)
+
+
+names(tr_test_comb)<-gsub("000000","tr",names(tr_test_comb),fixed=TRUE)
+tr_test_comb$tr_T0<-as.numeric(tr_test_comb$tr_T0)
+tr_test_comb$tr_T1<-as.numeric(tr_test_comb$tr_T1)
+tr_test_comb$tr_T2<-as.numeric(tr_test_comb$tr_T2)
+tr_test_comb$tr_T3<-as.numeric(tr_test_comb$tr_T3)
+tr_test_comb$tr_T4<-as.numeric(tr_test_comb$tr_T4)
+tr_test_comb$tr_T5<-as.numeric(tr_test_comb$tr_T5)
+tr_test_comb$tr_T0[tr_test_comb$tr_T0<10]<-NA
+tr_test_comb$tr_T1[tr_test_comb$tr_T1<10]<-NA
+tr_test_comb$tr_T2[tr_test_comb$tr_T2<10]<-NA
+tr_test_comb$tr_T3[tr_test_comb$tr_T3<10]<-NA
+tr_test_comb$tr_T4[tr_test_comb$tr_T4<10]<-NA
+tr_test_comb$tr_T5[tr_test_comb$tr_T5<10]<-NA
+
+tr_test_comb$tr_T0[tr_test_comb$tr_T0>30]<-NA
+tr_test_comb$tr_T1[tr_test_comb$tr_T1>30]<-NA
+tr_test_comb$tr_T2[tr_test_comb$tr_T2>30]<-NA
+tr_test_comb$tr_T3[tr_test_comb$tr_T3>30]<-NA
+tr_test_comb$tr_T4[tr_test_comb$tr_T4>30]<-NA
+tr_test_comb$tr_T5[tr_test_comb$tr_T5>30]<-NA
+tr_test_comb$timestamp<-as.numeric(tr_test_comb$timestamp)
+
+
+
+ggplot(tr_test_comb,aes(x=timestamp,y=tr_T1,color=ring_id,group=ring_id))+
+scale_y_continuous(limits=c(12,15))+
 geom_point()
-dev.off()
+
+ggplot(tr_test_comb,aes(x=tr_T0,y=tr_T1,color=ring_id,group=ring_id))+geom_point()
 
 
-png("~/test.png")
-ggplot(tr_a_002_20250110_m,aes(timestamp,value,color=variable))+
-geom_point()
-dev.off()
 
 
 ```
