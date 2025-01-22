@@ -1,13 +1,16 @@
-# Flow sensor thermistor ring tests
+# Processing model data
+## Objective
+* The water is heated for a period of 30 seconds. After this, we measure temperature at the beginning and then end of a 4 minute stretch and compare how the temperature has changed over the course of time. This allows us to track the moment of a heat plume.
+* We will compare model performance at different flow rates.
 
-## Part 1
-###  **Part 1a: Ambient temperature tests**
-* Start sensors logging at 1 minute or 5 minute intervals in a space with consistent temperature.
-    * Make sure when you deploy that the experiment name includes the thermistor ring ID.
-* At least every day take a temperature measurement and record in lab notebook.
+## Part 1: Run the model
+* Run the model for flow rates of 0.5, 1, 5, 10, 15, and 30 feet per day.
+* Extract the temperature data for each of the thermistor rings.
 
-### **Part 1b: Evaluating temperature performance**
-* Do sensors drift over time?
-* Are there any blips in the data or is it consistent?
-* How closely matched are the different thermistors to each other?
-* How closely matched are the different thermistors to our manual temperature measurements?
+## Part 2: Process the model data
+* For each experiment run, record the temperature at two points: 1) when the heater is turned off and 2) 4 minute after the heater has turned off.
+* Add these numbers to a table that includes temperatures at the beginning and end for each ring. Also record the water velocity for a given experiment.
+* Do the above for each experimental run.
+
+## Part 3: Run the calibration code
+* Open the R code and run calibration.
