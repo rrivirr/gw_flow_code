@@ -8,18 +8,118 @@ library(mgcv)
 library(reshape2)
 
 
-import_folder<-function(folder_path){
+import_ring<-function(folder_path,start_date,ring_id){
 
-tr_a_002_20250110 <-
+ring_data <-
     list.files(path = folder_path,
                pattern = "\\.CSV$",
                full.names = T) %>%
     map_df(~read_csv(., col_types = cols(.default = "c"),skip=0))
 
-tr_a_002_20250110_t<-as.data.frame(tr_a_002_20250110)
-return(tr_a_002_20250110_t)
+ring_data<-as.data.frame(ring_data)
+ring_data$exp_start<-as.Date(paste(start_date))
+ring_data$ring_id<-paste(ring_id)	
+return(ring_data)
 }
 
+
+tr_001_01<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001-Jan16th-Jan17th2025',"2025-01-16","tr_001")
+
+
+tr_002_01<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_16thJan-17thJan2025',"2025-01-16","tr_002")
+
+
+
+tr_002_02<-import_ring( '/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tra-002_14thJan-16thJan2025',"2025-01-14","tr_002")
+
+tr_001_02<-import_ring( '/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tra-001_Jan14-Jan16th2025',"2025-01-14","tr_001")
+
+tr_001_03<-import_ring( '/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001-Jan13-Jan14th',"2025-01-13","tr_001")
+
+tr_002_03<-import_ring( '/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_13thJan-14thJan',"2025-01-13","tr_002")
+
+tr_002_04<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_10thJan-13thJan2025',"2025-01-10","tr_002")
+
+tr_001_04<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001_10-13_Jan2025',"2025-01-10","tr_001")
+
+#tr_002_05<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-002_20Dec--06Jan',"2024-12-20","tr_002")
+	
+#tr_001_05<-import_ring( '/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001_20Dec--06Jan',"2024-12-20","tr_001")
+#tr_002_06<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/12 20 2024-tr-a-002',"2024-12-20","tr_002")
+	 
+#tr_001_06<-import_ring('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/12 20 2024-tr-a-001',"2024-12-20","tr_001")
+
+tr_comb<-bind_rows(tr_001_01,tr_002_01,tr_001_02,tr_002_02,tr_001_03,tr_002_03,tr_001_04,tr_002_04)
+tr_comb$dtp<-lubridate::as_datetime(as.integer(tr_comb$timestamp))
+saveRDS(tr_comb,"tr_comb.rds")
+tr_comb<-readRDS("tr_comb.rds")
+
+tr_comb_melt<-melt(tr_comb[,c(1:7,9,16)],id.vars=c("dtp","timestamp","ring_id"))
+tr_comb_melt$value<-as.numeric(tr_comb_melt$value)
+tr_comb_melt<-subset(tr_comb_melt,value>12.5&value<14)
+
+
+pdf("tr_comb_melt_facet_1.pdf")
+ggplot(tr_comb_melt,aes(x=dtp,y=value,color=variable))+
+geom_point()+
+facet_wrap(.~ring_id,ncol=1)
+dev.off()
+
+pdf("tr_comb_melt_facet_2.pdf")
+ggplot(tr_comb_melt,aes(x=dtp,y=value,color=variable))+
+geom_point()+
+facet_wrap(.~ring_id+variable,ncol=3)
+dev.off()
+
+
+#ring_lm<-lm(value~timestamp+ring_id,data=tr_comb_melt)
+#emmeans(ring_lm)
+#anova(ring_lm)
+
+#slopes <- emtrends(ring_lm, ~variable,var="timestamp")
+
+names(tr_comb)[2]<-"ring_1"
+tr_comb_min<-subset(tr_comb,ring_1>12.5&ring_1<14)
+ring_lm<-lm(ring_1~timestamp,data=tr_comb_min)
+emmeans(ring_lm)
+anova(ring_lm)
+
+slopes <- emtrends(ring_lm, ~variable,var="timestamp")
+
+# 2. View the slopes
+summary(slopes)
+
+# 3. For pairwise comparisons of slopes
+pairs(slopes)
+
+# If you want to see slopes at specific values of other variables:
+# Create a reference grid with specific values
+emtrends(model, 
+         specs = ~group,
+         var = "x",
+         at = list(some_other_variable = c(value1, value2)))
+
+
+pdf("tr_comb_melt_facet_3.pdf")
+ggplot(tr_comb_melt,aes(x=dtp,y=value,color=variable))+
+    geom_smooth(method="lm", se=FALSE)+
+geom_point()+
+facet_wrap(.~ring_id+variable,ncol=3)
+dev.off()
+
+
+png(
+  "test.png",
+  width     = 8,
+  height    = 8,
+  units     = "in",
+  res       = 1200,
+  pointsize = 4
+)
+ggplot(tr_comb_melt,aes(x=dtp,y=value,color=variable))+
+geom_point()+
+facet_wrap(.~ring_id+variable,ncol=3)
+dev.off()
 
 tr_001_20250110_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001_10-13_Jan2025'
 tr_001_20250113_folder<-'/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Atmosphere Tests/tr-a-001-Jan13-Jan14th'

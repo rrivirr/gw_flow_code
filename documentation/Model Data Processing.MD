@@ -1,13 +1,8 @@
-# Flow sensor thermistor ring tests
+# Thermistor Ring Modeling
 
-## Part 1
-###  **Part 1a: Ambient temperature tests**
-* Start sensors logging at 1 minute or 5 minute intervals in a space with consistent temperature.
-    * Make sure when you deploy that the experiment name includes the thermistor ring ID.
-* At least every day take a temperature measurement and record in lab notebook.
-
-### **Part 1b: Evaluating temperature performance**
-* Do sensors drift over time?
-* Are there any blips in the data or is it consistent?
-* How closely matched are the different thermistors to each other?
-* How closely matched are the different thermistors to our manual temperature measurements?
+## Setting up the model
+* heater is on for 30 seconds and then off for 240 seconds.
+* when extracting data from the model, you want to record:
+	* Values right when the heater is turned on.
+	* Values at the end of the 240 second off phase.
+	* For each timestep above, record 20 observations and average for subsequent calculations.
