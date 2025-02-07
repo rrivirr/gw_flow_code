@@ -4,8 +4,10 @@
 * We will compare model performance at different flow rates.
 
 ## Part 1: Run the model
-* Run the model for flow rates of 0.5, 1, 5, 10, 15, and 30 feet per day.
+* Select a wattage for the heating element.
+* For each wattage, run the model for flow rates of 0.5, 1, 5, 10, 15, and 30 feet per day.
 * Extract the temperature data for each of the thermistor rings.
+* Repeat for different wattage heating elements.
 
 ## Part 2: Process the model data
 * For each experiment run, record the temperature at two points: 1) when the heater is turned off and 2) 4 minute after the heater has turned off.
