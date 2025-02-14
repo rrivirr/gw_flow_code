@@ -10,7 +10,7 @@
 * Repeat for different wattage heating elements.
 
 ## Part 2: Process the model data
-* For each experiment run, record the temperature at two points: 1) when the heater is turned off and 2) 4 minutes after the heater has turned off. Do this just for the first cycle of each model.
+* For each experiment run, record the temperature at two points: 1) when the heater is turned off and 2) 4 minutes (or whatever the specified time is) after the heater has turned off. Do this just for the first cycle of each model.
 * Add these numbers to a table that includes temperatures at the beginning and end for each ring. Also record the water velocity for a given experiment.
 * Do the above for each experimental run.
 
