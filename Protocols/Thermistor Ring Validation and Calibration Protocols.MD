@@ -11,3 +11,6 @@
 * Are there any blips in the data or is it consistent?
 * How closely matched are the different thermistors to each other?
 * How closely matched are the different thermistors to our manual temperature measurements?
+*plot temperature against the timestamp for each ring, while usingthe sensor name as a legend
+*plot a generalized graph showing all the rings containing all sensors on a single graph.
+*combine all dataset and plot all sensors together while also taking advantage of legend for sensor nomenclature
