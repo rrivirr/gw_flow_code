@@ -3,7 +3,7 @@ library(lubridate)
 
 
 #import some data
-dat<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Version 1 Flow Chamber Tests/September-LabTesting-data/September12-120-ON_600-OFF_lowest-vel/8393763.CSV')
+dat<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Version 1 Flow Chamber Tests/September-LabTesting-data/September16-240-ON_1200-OFF_350ml-min(midpoint)/8945767.CSV')
 
 #function that labels each heating cycle numerically.
 add_cycle_column <- function(df, var_name) {
@@ -30,7 +30,7 @@ add_cycle_column <- function(df, var_name) {
   return(df)
 }
 
-
+dat$time.s<-as.numeric(dat$time.s)
 #converting epoch to posix
 dat$dtp<-as_datetime(dat$time.s)
 
@@ -41,7 +41,7 @@ dat2<-add_cycle_column(dat,"HEATER_heater")
 dat2_cycle7<-subset(dat2,cycle==59)
 
 #plotting the cycle that has been subset
-ggplot(dat2_cycle7,aes(dtp,X000000_TrawB-X000000_TrawE,color=as.factor(HEATER_heater)))+
+ggplot(dat2_cycle7,aes(dtp,RING01_TrawA,color=as.factor(HEATER_heater)))+
 geom_point()
 
 #plotting the whole dataset
