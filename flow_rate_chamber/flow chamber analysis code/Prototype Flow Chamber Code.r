@@ -4,9 +4,27 @@ library(reshape2)
 library(lubridate)
 library(stringr)
 
-t60s_180ml<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Version 1 Flow Chamber Tests/rriv-data_latest_lab_data/180ml/60s-20m/9442372.CSV')
-t60s_180ml_2<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Version 1 Flow Chamber Tests/rriv-data_latest_lab_data/180ml/60s-20m/9442822.CSV')
 
+
+flow_160<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Kerfoot USGS Flow Chamber/November 2025/20251110_1247/1049094.CSV')
+
+flow_190<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Kerfoot USGS Flow Chamber/November 2025/20251110_1543/1050225.CSV')
+
+
+flow_160$flow<-160
+flow_190$flow<-190
+
+flowd<-bind_rows(flow_160,flow_190)
+
+flowds<-flowd[,c("RING01_TrawA","RING01_TrawB","RING01_TrawC","RING01_TrawD","RING01_TrawE","RING01_TrawF","flow","time.s")]
+
+flowds$dtp<-as_datetime(flowds$time.s)
+
+flowdsm<-melt(flowds,na.rm=TRUE,id=c("flow","time.s","dtp"))
+
+ggplot(flowdsm,aes(dtp,value,color=flow))+
+geom_point()+
+facet_wrap(.~variable)
 
 
 t60s_180ml_c<-bind_rows(t60s_180ml,t60s_180ml_2)
