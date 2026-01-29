@@ -6,10 +6,11 @@ simout<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.co
 
 names(simout)[1:6]<-c("Time","Type","Velocity_ft","XZ_Angle","YZ_Angle","Cycle")
 
-simout$A1A3_Difference<-simout$A1-simout$A3
-simout$A2D2_Difference<-simout$A2-simout$D2
-simout$B2E2_Difference<-simout$B2-simout$E2
-simout$C2F2_Difference<-simout$C2-simout$F2
+simout$A1A3<-simout$A1-simout$A3
+simout$A1D3<-simout$A1-simout$D3
+simout$A2D2<-simout$A2-simout$D2
+simout$B2E2<-simout$B2-simout$E2
+simout$C2F2<-simout$C2-simout$F2
 simout$XZ_Angle_fac<-as.factor(simout$XZ_Angle)
 simout$YZ_Angle_fac<-as.factor(simout$YZ_Angle)
 simout$Velocity_ft_fac<-as.factor(simout$Velocity_ft)
@@ -17,8 +18,11 @@ simout$Velocity_ft_fac<-as.factor(simout$Velocity_ft)
 #Compare time 1 to time 480 (8 minutes)
 
 
-simout_max<-summaryBy(A2D2_Difference+B2E2_Difference+C2F2_Difference~XZ_Angle_fac+simout$Velocity_ft_fac,data=simout,fun=c("which.min"))
+simout_max<-summaryBy(A2D2_Difference+A1D3_Difference+B2E2_Difference+C2F2_Difference~XZ_Angle_fac+simout$Velocity_ft_fac,data=simout,fun=c("which.min"))
 
+
+
+ggplot(simout,aes())
 
 
 
@@ -49,19 +53,25 @@ for(i in XZ_angles){
 		C2F2_difference_1<-simout_sub$C2F2[simout_sub$Time==1]
 		C2F2_difference_480<-simout_sub$C2F2[simout_sub$Time==480]		
 
-		A1A3_difference_1<-simout_sub$A1A3[simout_sub$Time==1]
-		A1A3_difference_480<-simout_sub$A1A3[simout_sub$Time==480]		
+		A1D3_difference_1<-simout_sub$A1D3[simout_sub$Time==1]
+		A1D3_difference_480<-simout_sub$A1D3[simout_sub$Time==480]		
 		
-		timings_compiled<-bind_rows(timings_compiled,data.frame(XZ_angles=i,YZ_angles=k,Velocity_ft=j,A2D2_max_difference,B2E2_max_difference,C2F2_max_difference,A1A3_difference_1,A1A3_difference_480,A2D2_difference_1,A2D2_difference_480,B2E2_difference_1,B2E2_difference_480,C2F2_difference_1,C2F2_difference_480))
+		timings_compiled<-bind_rows(timings_compiled,data.frame(XZ_angles=i,YZ_angles=k,Velocity_ft=j,A2D2_max_difference,B2E2_max_difference,C2F2_max_difference,A1D3_difference_1,A1D3_difference_480,A2D2_difference_1,A2D2_difference_480,B2E2_difference_1,B2E2_difference_480,C2F2_difference_1,C2F2_difference_480))
 	}
 	}
 }
 }
 
+
+
+
+
+
 timings_compiled$B2E2_timediff <- timings_compiled$B2E2_difference_480-timings_compiled$B2E2_difference_1
 timings_compiled$C2F2_timediff <- timings_compiled$C2F2_difference_480-timings_compiled$C2F2_difference_1
 timings_compiled$A2D2_timediff <- timings_compiled$A2D2_difference_480-timings_compiled$A2D2_difference_1
-timings_compiled$A1A3_timediff <- timings_compiled$A1A3_difference_480-timings_compiled$A1A3_difference_1
+#timings_compiled$A1A3_timediff <- timings_compiled$A1A3_difference_480-timings_compiled$A1A3_difference_1
+timings_compiled$A1D3_timediff <- timings_compiled$A1D3_difference_480-timings_compiled$A1D3_difference_1
 
 
 A_D_Angle <- 90 * pi / 180
@@ -80,10 +90,22 @@ timings_compiled$C_F_Z<-(timings_compiled$C2F2_timediff)*cos(F_C_Angle)
 
 
 
+
+#Y Angle Calcs
+
+timings_compiled$A1_D3_Y<-timings_compiled$A1D3_timediff*sin(57.68)
+
+
+ggplot(timings_compiled,aes(YZ_angles,A1_D3_Y,color=Velocity_ft))+
+geom_point()
+
 timings_compiled$A1_A3_Y<-timings_compiled$A1A3_timediff
 
+#7.102
 
 
+#Degrees = cos(6/7.102) * (180/pi)
+#cos(3.8/7.102) * (180/pi)
 
 timings_compiled$total_z_mag<-timings_compiled$C_F_Z+timings_compiled$B_E_Z+timings_compiled$A_D_Z
 timings_compiled$total_x_mag<-timings_compiled$C_F_X+timings_compiled$B_E_X+timings_compiled$A_D_X
