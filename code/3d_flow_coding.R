@@ -87,21 +87,30 @@ timings_compiled$C1F3_timediff <- timings_compiled$C1F3_difference_480-timings_c
 
 
 
-A_D_Angle <- 90 * pi / 180
+A_D_Angle <- 30* pi / 180
 timings_compiled$A_D_X<-(timings_compiled$A2D2_timediff)*sin(A_D_Angle)
 timings_compiled$A_D_Z<-(timings_compiled$A2D2_timediff)*cos(A_D_Angle)
 
 
-B_E_Angle <- 330 * pi / 180
+B_E_Angle <- 90 * pi / 180
 timings_compiled$B_E_X<-(timings_compiled$B2E2_timediff)*sin(B_E_Angle)
 timings_compiled$B_E_Z<-(timings_compiled$B2E2_timediff)*cos(B_E_Angle)
 
 
-F_C_Angle <- 30 * pi / 180
+F_C_Angle <- 150 * pi / 180
 timings_compiled$C_F_X<-(timings_compiled$C2F2_timediff)*sin(F_C_Angle)
 timings_compiled$C_F_Z<-(timings_compiled$C2F2_timediff)*cos(F_C_Angle)
 
 
+timings_compiled$total_x<-timings_compiled$C_F_X+timings_compiled$B_E_X+timings_compiled$A_D_X
+timings_compiled$total_z<-timings_compiled$C_F_Z+timings_compiled$B_E_Z+timings_compiled$A_D_Z
+
+timings_compiled$total_mag<-sqrt((timings_compiled$total_x^2)+(timings_compiled$total_z^2))
+
+tc_limit<-subset(timings_compiled,YZ_angles==0)
+ggplot(tc_limit,aes(as.numeric(Velocity_ft),total_mag,group=XZ_angles,color=XZ_angles))+
+geom_point(aes())+
+geom_smooth(method="lm",se=FALSE)
 
 
 #Y Angle Calcs
