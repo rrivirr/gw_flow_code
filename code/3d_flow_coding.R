@@ -2,7 +2,7 @@ library(dplyr)
 library(doBy)
 library(ggplot2)
 
-simout<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Ansys_data&Analysis/Ansys_Results/240sec_ON-time/ALL_angles_ALL_velocities_simulation_data_restructured.csv')
+simout<-read.csv('/Users/jdh/Library/CloudStorage/GoogleDrive-jakehosen@gmail.com/My Drive/RRIV/FlowSensor/Ansys_data&Analysis/ALL_angles_ALL_velocities_simulation_data_restructured_New.csv')
 
 names(simout)[1:6]<-c("Time","Type","Velocity_ft","XZ_Angle","YZ_Angle","Cycle")
 
@@ -13,6 +13,12 @@ simout$C1F3<-simout$C1-simout$F3
 simout$A2D2<-simout$A2-simout$D2
 simout$B2E2<-simout$B2-simout$E2
 simout$C2F2<-simout$C2-simout$F2
+simout$r1_mean<-simout$A1+simout$B1+simout$C1+simout$D1+simout$E1+simout$F1
+simout$r2_mean<-simout$A2+simout$B2+simout$C2+simout$D2+simout$E2+simout$F2
+simout$r3_mean<-simout$A3+simout$B3+simout$C3+simout$D3+simout$E3+simout$F3
+
+simout$r1_r3_diff<-simout$r1_mean-simout$r3_mean
+
 simout$XZ_Angle_fac<-as.factor(simout$XZ_Angle)
 simout$YZ_Angle_fac<-as.factor(simout$YZ_Angle)
 simout$Velocity_ft_fac<-as.factor(simout$Velocity_ft)
@@ -22,6 +28,15 @@ simout$Velocity_ft_fac<-as.factor(simout$Velocity_ft)
 
 #simout_max<-summaryBy(A2D2_Difference+A1D3_Difference+B2E2_Difference+C2F2_Difference~XZ_Angle_fac+simout$Velocity_ft_fac,data=simout,fun=c("which.min"))
 
+
+simout_v15_yz30<-subset(simout,Velocity_ft==15 & XZ_Angle==0)
+
+ggplot(simout_v15_yz30,aes(Time,A1A3,color=as.factor(YZ_Angle)))+
+geom_point(size=2)
+
+ggplot()+
+	geom_line(data=simout_v15_yz30,aes(Time,A1,color=as.factor(YZ_Angle)),linetype="dashed",size=2)+
+	geom_line(data=simout_v15_yz30,aes(Time,A3,color=as.factor(YZ_Angle)),size=2)
 
 
 
@@ -119,8 +134,9 @@ timings_compiled$A1_D3_Y<-timings_compiled$A1D3_timediff*sin(57.68)
 timings_compiled$B1_E3_Y<-timings_compiled$B1E3_timediff*sin(57.68)
 timings_compiled$C1_F3_Y<-timings_compiled$C1F3_timediff*sin(57.68)
 
+timings_compiled$Y_sum<-timings_compiled$A1_D3_Y + timings_compiled$B1_E3_Y + timings_compiled$C1_F3_Y
 
-ggplot(timings_compiled,aes(YZ_angles,A1_D3_Y,color=Velocity_ft,group=Velocity_ft))+
+ggplot(timings_compiled,aes(YZ_angles,Y_sum,color=Velocity_ft,group=Velocity_ft))+
 geom_smooth(method="lm")+
 geom_point(size=10)
 
@@ -134,6 +150,8 @@ geom_point(size=10)
 ggplot(timings_compiled,aes(YZ_angles,C1_F3_Y,color=Velocity_ft,group=Velocity_ft))+
 geom_smooth(method="lm")+
 geom_point(size=10)
+
+
 
 
 
